@@ -52,6 +52,9 @@ export class CanvasTextRenderer {
   }
 
   public downloadCurrentPage() {
+    if (!this.ctx) {
+      return;
+    }
     const link = document.createElement('a');
     link.download = 'text.png';
     link.href = this.canvas.toDataURL();
@@ -59,10 +62,20 @@ export class CanvasTextRenderer {
   }
 
   public downloadAll() {
-    const link = document.createElement('a');
-    link.download = 'text.png';
-    link.href = this.canvas.toDataURL();
-    link.click();
+    if (!this.ctx) {
+      return;
+    }
+
+    const currentPageIndex = this.curentPageIndex;
+
+    this.pages.forEach((_, index) => {
+      this.curentPageIndex = index;
+      this.drawText();
+      this.downloadCurrentPage();
+    });
+
+    this.curentPageIndex = currentPageIndex;
+    this.drawText();
   }
 
   private createCavnas() {
@@ -84,7 +97,7 @@ export class CanvasTextRenderer {
   }
 
   private computedContent(text: string) {
-    const { height, padding, lineHeight, width } = this.options;
+    const { height, padding, lineHeight, width, newlineRegExp } = this.options;
 
     const segments = generateSegments(text);
 
@@ -94,6 +107,7 @@ export class CanvasTextRenderer {
       measureText: (text) => {
         return this.ctx?.measureText(text) || { width: 0 };
       },
+      newlineRegExp,
     });
 
     const contentHeight = height - padding.top - padding.bottom;

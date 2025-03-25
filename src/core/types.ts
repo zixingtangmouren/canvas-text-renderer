@@ -14,4 +14,5 @@ export interface CreateCancvasTextRendererOptions {
     bottom: number;
     left: number;
   };
+  newlineRegExp?: RegExp;
 }

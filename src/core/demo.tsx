@@ -10,10 +10,12 @@ function Demo() {
     renderer.current = createCancvasTextRenderer(
       divRef.current as HTMLElement,
       {
-        width: 400,
+        width: 600,
         height: 300,
         fontSize: 16,
         lineHeight: 24,
+        backgroundColor: '#b3b6bb',
+        newlineRegExp: /。/g,
         padding: {
           top: 10,
           right: 10,
@@ -48,6 +50,10 @@ function Demo() {
     renderer.current?.downloadCurrentPage();
   };
 
+  const downloadAll = () => {
+    renderer.current?.downloadAll();
+  };
+
   return (
     <div>
       <textarea
@@ -63,6 +69,9 @@ function Demo() {
         <button type="button" onClick={download}>
           下载图片
         </button>
+        <button type="button" onClick={downloadAll}>
+          下载所有图片
+        </button>
         <button type="button" onClick={prevPage}>
           上一页
         </button>
@@ -71,12 +80,7 @@ function Demo() {
         </button>
       </div>
       <br />
-      <div
-        ref={divRef}
-        style={{
-          border: '1px solid #000',
-        }}
-      ></div>
+      <div ref={divRef}></div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ interface GenerateSegmentsOptions {
 
 interface LineBreakOptions {
   maxWidth: number;
+  // 自定义换行逻辑
   newlineRegExp?: RegExp;
   measureText: (text: string) => { width: number };
 }
