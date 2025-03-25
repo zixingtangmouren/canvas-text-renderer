@@ -1,9 +1,9 @@
-import CanvasTextRenderer from './canvas-text-renderer';
+import { CanvasTextRenderer } from './canvas-text-renderer';
 import { CreateCancvasTextRendererOptions } from './types';
 
 export const createCancvasTextRenderer = (
   dom: HTMLElement,
-  options?: CreateCancvasTextRendererOptions,
+  options?: Partial<CreateCancvasTextRendererOptions>,
 ) => {
   if (!dom) {
     return;
@@ -14,7 +14,7 @@ export const createCancvasTextRenderer = (
     height: 300,
     fontSize: 16,
     fontFamily: 'sans-serif',
-    lineHeight: 1.5,
+    lineHeight: 24,
     padding: {
       top: 0,
       right: 0,
@@ -30,4 +30,6 @@ export const createCancvasTextRenderer = (
   return new CanvasTextRenderer(dom, _options);
 };
 
+export * from './canvas-text-renderer';
+export * from './types';
 export * from './utils';

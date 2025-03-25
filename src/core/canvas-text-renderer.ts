@@ -1,7 +1,7 @@
 import { CreateCancvasTextRendererOptions } from './types';
 import { generateSegments, lineBreak, pageBreak } from './utils';
 
-export default class CanvasTextRenderer {
+export class CanvasTextRenderer {
   private dom: HTMLElement;
   private options: CreateCancvasTextRendererOptions;
   private canvas: HTMLCanvasElement;
@@ -9,6 +9,7 @@ export default class CanvasTextRenderer {
   private segments: string[] = [];
   private lines: string[] = [];
   private pages: string[][] = [];
+  private curentPageIndex = 0;
 
   constructor(dom: HTMLElement, options: CreateCancvasTextRendererOptions) {
     this.dom = dom;
@@ -23,32 +24,22 @@ export default class CanvasTextRenderer {
     // 计算文本内容
     this.computedContent(text);
 
-    // 绘制文本 TODO:分页
-    console.log(this.pages);
+    // 绘制文本
+    this.drawText();
   }
 
-  private computedContent(text: string) {
-    const { height, padding, lineHeight, fontSize } = this.options;
+  public nextPage() {
+    if (this.curentPageIndex < this.pages.length - 1) {
+      this.curentPageIndex++;
+      this.drawText();
+    }
+  }
 
-    const segments = generateSegments(text);
-
-    const lines = lineBreak(segments, {
-      maxWidth: this.options.width || 100,
-      measureText: (text) => {
-        return this.ctx?.measureText(text) || { width: 0 };
-      },
-    });
-
-    const contentHeight = height - padding.top - padding.bottom;
-
-    const pages = pageBreak(lines, {
-      lineHeight: lineHeight * fontSize,
-      contentHeight: contentHeight,
-    });
-
-    this.segments = segments;
-    this.lines = lines;
-    this.pages = pages;
+  public prevPage() {
+    if (this.curentPageIndex > 0) {
+      this.curentPageIndex--;
+      this.drawText();
+    }
   }
 
   public unmount() {
@@ -57,12 +48,27 @@ export default class CanvasTextRenderer {
     this.segments = [];
     this.lines = [];
     this.pages = [];
+    this.curentPageIndex = 0;
+  }
+
+  public downloadCurrentPage() {
+    const link = document.createElement('a');
+    link.download = 'text.png';
+    link.href = this.canvas.toDataURL();
+    link.click();
+  }
+
+  public downloadAll() {
+    const link = document.createElement('a');
+    link.download = 'text.png';
+    link.href = this.canvas.toDataURL();
+    link.click();
   }
 
   private createCavnas() {
     const canvas = document.createElement('canvas');
-    canvas.width = this.options.width || 100;
-    canvas.height = this.options.height || 100;
+    canvas.width = this.options.width;
+    canvas.height = this.options.height;
     const dpi = window.devicePixelRatio || 1;
     canvas.style.width = `${canvas.width}px`;
     canvas.style.height = `${canvas.height}px`;
@@ -75,5 +81,60 @@ export default class CanvasTextRenderer {
     this.dom.appendChild(canvas);
 
     return { canvas, ctx };
+  }
+
+  private computedContent(text: string) {
+    const { height, padding, lineHeight, width } = this.options;
+
+    const segments = generateSegments(text);
+
+    const maxWidth = width - padding.left - padding.right;
+    const lines = lineBreak(segments, {
+      maxWidth,
+      measureText: (text) => {
+        return this.ctx?.measureText(text) || { width: 0 };
+      },
+    });
+
+    const contentHeight = height - padding.top - padding.bottom;
+
+    const pages = pageBreak(lines, {
+      lineHeight,
+      contentHeight,
+    });
+
+    this.segments = segments;
+    this.lines = lines;
+    this.pages = pages;
+    this.curentPageIndex = 0;
+  }
+
+  private drawText() {
+    const { ctx, options, curentPageIndex } = this;
+    const { backgroundColor, textColor, padding } = options;
+    const currentPage = this.pages[curentPageIndex];
+
+    if (!ctx || !currentPage) {
+      return;
+    }
+
+    // 清空画布
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    // 绘制背景
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    // 绘制文本
+    ctx.fillStyle = textColor;
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+
+    currentPage.forEach((line, index) => {
+      const x = padding.left;
+      let y = index * options.lineHeight + padding.top;
+
+      ctx.fillText(line, x, y);
+    });
   }
 }
