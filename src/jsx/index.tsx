@@ -1,7 +1,5 @@
 import React from 'react';
 
-function CanvasTextRenderer() {
+export function CanvasTextRendererComp() {
   return <div>TODO</div>;
 }
-
-export default CanvasTextRenderer;
