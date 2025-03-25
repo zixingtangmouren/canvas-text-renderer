@@ -3,6 +3,6 @@ import { defineConfig } from 'dumi';
 export default defineConfig({
   outputPath: 'docs-dist',
   themeConfig: {
-    name: 'canvas-text-renderer',
+    name: '文本渲染器',
   },
 });
