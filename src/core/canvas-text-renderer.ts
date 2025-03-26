@@ -79,17 +79,19 @@ export class CanvasTextRenderer {
   }
 
   private createCavnas() {
+    const { width, height, fontSize, fontFamily } = this.options;
     const canvas = document.createElement('canvas');
-    canvas.width = this.options.width;
-    canvas.height = this.options.height;
+
     const dpi = window.devicePixelRatio || 1;
+    canvas.width = width * dpi;
+    canvas.height = height * dpi;
+
     canvas.style.width = `${canvas.width}px`;
     canvas.style.height = `${canvas.height}px`;
-    canvas.width *= dpi;
-    canvas.height *= dpi;
+
     const ctx = canvas.getContext('2d')!;
     ctx.scale(dpi, dpi);
-    ctx.font = `${this.options.fontSize}px ${this.options.fontFamily}`;
+    ctx.font = `${fontSize}px ${fontFamily}`;
     // TODO: 这里需要考虑 dom 节点的位置，比如 dom 节点是绝对定位的，那么 canvas 节点需要相对于 dom 节点定位
     this.dom.appendChild(canvas);
 
@@ -146,8 +148,7 @@ export class CanvasTextRenderer {
 
     currentPage.forEach((line, index) => {
       const x = padding.left;
-      let y = index * options.lineHeight + padding.top;
-
+      const y = index * options.lineHeight + padding.top;
       ctx.fillText(line, x, y);
     });
   }

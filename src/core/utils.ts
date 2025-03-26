@@ -22,8 +22,8 @@ export const generateSegments = (
   options?: GenerateSegmentsOptions,
 ) => {
   const regExp = options?.regExp || splitRegExp;
-  const segment = text.split(regExp).filter((s) => s && s.trim());
-  return segment;
+  const segments = text.split(regExp).filter((s) => s && s.trim());
+  return segments;
 };
 
 // 分行
@@ -84,15 +84,18 @@ export const pageBreak = (
   const pages = [];
   let currentPage = [];
   let currentHeight = 0;
+
   for (const line of lines) {
     if (currentHeight + lineHeight > contentHeight) {
       pages.push(currentPage);
       currentPage = [];
       currentHeight = 0;
     }
+
     currentPage.push(line);
     currentHeight += lineHeight;
   }
+
   if (currentPage.length > 0) {
     pages.push(currentPage);
   }
